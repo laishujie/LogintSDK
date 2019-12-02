@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">LoginSDKHelper</string>
+
+    <string name="wx_uninstall">微信未安装</string>
+    <string name="wx_appid_error">密钥不能为空</string>
+
+
+</resources>
