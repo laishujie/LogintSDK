@@ -17,8 +17,7 @@ import android.os.Bundle
 import com.hithway.loginsdkhelper.SocialUtil
 import com.hithway.loginsdkhelper.bean.ShareObj
 import com.tencent.connect.share.QQShare
-
-
+import java.util.ArrayList
 
 
 /**
@@ -31,38 +30,40 @@ import com.tencent.connect.share.QQShare
  */
 class QqHelper(activity: Activity, appId: String?, appKey: String?, appSecret: String?) :
     BaseSdkHelper<QQUserInfoResponse>(activity, appId, appKey, appSecret) {
+
     override fun shareWeb(shareTag: SHARE_TAG, shareObj: ShareObj) {
-
-    }
-
-    override fun shareImage(shareTag: SHARE_TAG, shareObj: ShareObj) {
         if(shareTag == SHARE_TAG.QQ){
+            // 分享图文
+            val params =
+                buildCommonBundle(shareObj.title, shareObj.summary, shareObj.targetUrl)
+            params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT)
+            // 本地或网络路径
+            if (!TextUtils.isEmpty(shareObj.thumbImagePath))
+                params.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, shareObj.thumbImagePath)
 
-        }
-
-        /*if (shareTag === Target.SHARE_QQ_FRIENDS) {
-            // 可以兼容分享图片和gif
-            val params = buildCommonBundle("", shareMediaObj.getSummary(), "", shareTarget)
-            params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_IMAGE)
-            params.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, shareMediaObj.getThumbImagePath())
-            mTencentApi.shareToQQ(activity, params, mIUiListenerWrap)
-        } else if (shareTarget === Target.SHARE_QQ_ZONE) {
+            mTencent.shareToQQ(getActivity(),params,mIShareListener)
+        }else{
+            val imageUrls = ArrayList<String>()
             val params = Bundle()
             params.putInt(
                 QzoneShare.SHARE_TO_QZONE_KEY_TYPE,
-                QzonePublish.PUBLISH_TO_QZONE_TYPE_PUBLISHMOOD
+                QzoneShare.SHARE_TO_QZONE_TYPE_IMAGE_TEXT
             )
-            params.putString(
-                QzoneShare.SHARE_TO_QQ_SUMMARY,
-                shareMediSHARE_REQ_CODEaObj.getSummary()
-            )
-            val imageUrls = ArrayList()
-            imageUrls.add(shareMediaObj.getThumbImagePath())
-            params.putStringArrayList(QzonePublish.PUBLISH_TO_QZONE_IMAGE_URL, imageUrls)
-            mTencentApi.publishToQzone(activity, params, mIUiListenerWrap)
-        }*/
+            params.putString(QzoneShare.SHARE_TO_QQ_SUMMARY, shareObj.summary)
+            params.putString(QzoneShare.SHARE_TO_QQ_TITLE, shareObj.title)
+            params.putString(QzoneShare.SHARE_TO_QQ_TARGET_URL, shareObj.targetUrl)
 
+            if(!TextUtils.isEmpty(shareObj.thumbImagePath)){
+                imageUrls.add(shareObj.thumbImagePath!!)
+            }
+            params.putStringArrayList(QzoneShare.SHARE_TO_QQ_IMAGE_URL, imageUrls)
+            mTencent.shareToQzone(getActivity(), params, mIShareListener)
+        }
     }
+
+    override fun shareImage(shareTag: SHARE_TAG, shareObj: ShareObj) {
+    }
+
 
     override fun shareMusic(shareTag: SHARE_TAG, shareObj: ShareObj) {
     }
@@ -70,6 +71,20 @@ class QqHelper(activity: Activity, appId: String?, appKey: String?, appSecret: S
     override fun shareOpenApp() {
     }
 
+    private fun buildCommonBundle(
+        title: String?,
+        summary: String?,
+        targetUrl: String?
+    ): Bundle {
+        val params = Bundle()
+        if (!TextUtils.isEmpty(title))
+            params.putString(QQShare.SHARE_TO_QQ_TITLE, title)
+        if (!TextUtils.isEmpty(summary))
+            params.putString(QQShare.SHARE_TO_QQ_SUMMARY, summary)
+        if (!TextUtils.isEmpty(targetUrl))
+            params.putString(QQShare.SHARE_TO_QQ_TARGET_URL, targetUrl)
+        return params
+    }
 
     override fun share(
         shareTag: SHARE_TAG,

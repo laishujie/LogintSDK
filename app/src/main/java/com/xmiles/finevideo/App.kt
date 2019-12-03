@@ -11,7 +11,7 @@ class App : Application() {
             .wxAppSecret("934ea89a6a8d8b8d910849c49b29008a")
             .qqAppId("1107942266")
             .wbAppId("2751198159")
-            .wbRedirectUrl("")
+            .wbRedirectUrl("http://sns.whalecloud.com/sina2/callback")
             .build()
     }
 
@@ -19,7 +19,4 @@ class App : Application() {
         return mSocialSdkHelper
     }
 
-    override fun onCreate() {
-        super.onCreate()
-    }
 }

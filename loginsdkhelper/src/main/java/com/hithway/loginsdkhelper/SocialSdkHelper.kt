@@ -129,8 +129,7 @@ class SocialSdkHelper private constructor(private val builder: Builder) {
                 mQqHelper?.login(mQQSuccessCallBack, mErrorCallBack)
             }
             PLATFORM.WEI_BO -> {
-                mQqHelper?.onDestroy()
-                mWbHelper = WbHelper(mActivity?.get()!!, getWbAppId(), "", "", getWbRedirectUrl())
+                initWbHelper()
                 mWbHelper?.login(mWbSuccessCallBack, mErrorCallBack)
             }
         }
@@ -148,6 +147,10 @@ class SocialSdkHelper private constructor(private val builder: Builder) {
                 initQqHelper()
                 mQqHelper?.share(shareTag, shareObj, mShareSuccessCallBack, mErrorCallBack)
             }
+            SHARE_TAG.SINA_WB->{
+                initWbHelper()
+                mWbHelper?.share(shareTag, shareObj, mShareSuccessCallBack, mErrorCallBack)
+            }
         }
 
     }
@@ -160,6 +163,11 @@ class SocialSdkHelper private constructor(private val builder: Builder) {
     private fun initQqHelper() {
         mQqHelper?.onDestroy()
         mQqHelper = QqHelper(mActivity?.get()!!, getQqAppId(), "", "")
+    }
+
+    private fun initWbHelper(){
+        mQqHelper?.onDestroy()
+        mWbHelper = WbHelper(mActivity?.get()!!, getWbAppId(), "", "", getWbRedirectUrl())
     }
 
 

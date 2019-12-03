@@ -10,6 +10,7 @@ import com.hithway.loginsdkhelper.callback.PLATFORM
 import com.hithway.loginsdkhelper.callback.SHARE_TAG
 import kotlinx.android.synthetic.main.activity_main.*
 
+
 class MainActivity : AppCompatActivity() {
 
     private val mSocialSdkHelper by lazy { (application as App).getSocialSdkHelper() }
@@ -37,27 +38,46 @@ class MainActivity : AppCompatActivity() {
                 R.id.radioShareText -> {
                     ShareObj.buildTextObj(title, des)
                 }
-                R.id.radioShareImage->{
-                    ShareObj.buildImageObj(BitmapFactory.decodeResource(resources, R.mipmap.send_img))
+                R.id.radioShareImage -> {
+                    ShareObj.buildImageObj(
+                        BitmapFactory.decodeResource(
+                            resources,
+                            R.mipmap.send_img
+                        )
+                    )
                 }
                 R.id.radioShareWeb -> {
                     ShareObj.buildWebObj(
                         title,
                         des,
-                        BitmapFactory.decodeResource(resources, R.mipmap.send_img) ,
-                        "http://baidu.com"
+                        BitmapFactory.decodeResource(resources, R.mipmap.send_img),
+                        "http://imgcache.qq.com/qzone/space_item/pre/0/66768.gif"
+                        , "http://baidu.com"
                     )
                 }
-                R.id.radioShareMusic->{
-                    ShareObj.buildMusicObj(title,
+                R.id.radioShareTextImage -> {
+                    ShareObj.buildImageObj(
+                        BitmapFactory.decodeResource(
+                            resources,
+                            R.mipmap.send_img
+                        ), des
+                    )
+                }
+                R.id.radioShareMusic -> {
+                    ShareObj.buildMusicObj(
+                        title,
                         des,
                         BitmapFactory.decodeResource(resources, R.mipmap.send_img),
-                        "http://staff2.ustc.edu.cn/~wdw/softdown/index.asp/0042515_05.ANDY.mp3")
+                        "http://staff2.ustc.edu.cn/~wdw/softdown/index.asp/0042515_05.ANDY.mp3"
+                    )
                 }
-                R.id.radioShareVideo->{
-                    ShareObj.buildVideoObj(title,
+                R.id.radioShareVideo -> {
+                    ShareObj.buildVideoObj(
+                        title,
                         des,
-                        BitmapFactory.decodeResource(resources, R.mipmap.send_img),"http://www.qq.com")
+                        BitmapFactory.decodeResource(resources, R.mipmap.send_img),
+                        "http://www.qq.com"
+                    )
                 }
 
                 else -> null
@@ -67,14 +87,17 @@ class MainActivity : AppCompatActivity() {
                 R.id.radioShareWX -> {
                     SHARE_TAG.WEIXIN
                 }
-                R.id.radioShareWXCircle->{
+                R.id.radioShareWXCircle -> {
                     SHARE_TAG.WEIXIN_CIRCLE
                 }
-                R.id.radioShareQQ->{
+                R.id.radioShareQQ -> {
                     SHARE_TAG.QQ
                 }
-                R.id.radioShareQZone->{
+                R.id.radioShareQZone -> {
                     SHARE_TAG.QZONE
+                }
+                R.id.radioShareSinaWB->{
+                    SHARE_TAG.SINA_WB
                 }
                 else -> null
             }

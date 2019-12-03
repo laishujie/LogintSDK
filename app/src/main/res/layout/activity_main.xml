@@ -80,10 +80,16 @@
                 android:orientation="vertical">
 
                 <RadioButton
-                    android:id="@+id/radioShareText"
+                    android:id="@+id/radioShareWeb"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
+                    android:text="网页" />
+
+                <RadioButton
+                    android:id="@+id/radioShareText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="文字" />
 
                 <RadioButton
@@ -91,6 +97,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="图片" />
+
+                <RadioButton
+                    android:id="@+id/radioShareTextImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="图文" />
 
                 <RadioButton
                     android:id="@+id/radioShareMusic"
@@ -104,11 +116,7 @@
                     android:layout_height="wrap_content"
                     android:text="视频" />
 
-                <RadioButton
-                    android:id="@+id/radioShareWeb"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="网页" />
+
             </RadioGroup>
         </LinearLayout>
 
@@ -172,8 +180,8 @@
         android:id="@+id/share_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="分享"
         android:layout_marginTop="20dp"
+        android:text="分享"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />

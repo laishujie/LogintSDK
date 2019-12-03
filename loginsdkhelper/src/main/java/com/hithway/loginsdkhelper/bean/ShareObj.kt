@@ -31,6 +31,8 @@ class ShareObj(val shareType: SHARE_TYPE) : Serializable {
     // 使用本地 intent 打开，分享本地视频用
     var isShareByIntent = false
 
+    var thumbImagePath: String? = null
+
     companion object {
         // 分享文字，qq 好友原本不支持，使用intent兼容
         fun buildTextObj(title: String, summary: String): ShareObj {
@@ -42,10 +44,11 @@ class ShareObj(val shareType: SHARE_TYPE) : Serializable {
 
         // 分享web，打开链接
         fun buildWebObj(
-            title: String, summary: String, thumbImageBitmap: Bitmap, targetUrl: String
+            title: String, summary: String, thumbImageBitmap: Bitmap,thumbImagePath:String, targetUrl: String
         ): ShareObj {
             val shareMediaObj = ShareObj(SHARE_TYPE.SHARE_TYPE_WEB)
             shareMediaObj.init(title, summary, thumbImageBitmap, targetUrl)
+            shareMediaObj.thumbImagePath = thumbImagePath
             return shareMediaObj
         }
 
@@ -56,6 +59,13 @@ class ShareObj(val shareType: SHARE_TYPE) : Serializable {
             return shareMediaObj
         }
 
+        // 分享图片，带描述，qq微信好友会分为两条消息发送
+        fun buildImageObj(bitmap: Bitmap, summary: String): ShareObj {
+            val shareMediaObj = ShareObj(SHARE_TYPE.SHARE_TYPE_IMAGE)
+            shareMediaObj.thumbImageBitmap = bitmap
+            shareMediaObj.summary = summary
+            return shareMediaObj
+        }
 
         // 分享音乐,qq空间不支持，使用web分享
         fun buildMusicObj(
@@ -86,10 +96,10 @@ class ShareObj(val shareType: SHARE_TYPE) : Serializable {
         // 本地视频
         fun buildVideoObj(title: String, summary: String, localVideoPath: String): ShareObj {
             val shareMediaObj = ShareObj(SHARE_TYPE.SHARE_TYPE_VIDEO)
-            shareMediaObj.mediaPath=(localVideoPath)
-            shareMediaObj.isShareByIntent=(true)
-            shareMediaObj.title=(title)
-            shareMediaObj.summary=(summary)
+            shareMediaObj.mediaPath = (localVideoPath)
+            shareMediaObj.isShareByIntent = (true)
+            shareMediaObj.title = (title)
+            shareMediaObj.summary = (summary)
             return shareMediaObj
         }
 
