@@ -6,10 +6,9 @@ import android.os.Parcelable
 import com.hithway.loginsdkhelper.callback.SHARE_TYPE
 
 
-class ShareObj(val shareType: SHARE_TYPE) : Serializable {
+open class ShareObj(val shareType: SHARE_TYPE) : Serializable {
 
     val TAG = ShareObj::class.java.simpleName
-
 
     // title 标题，如果不设置为app name
     var title: String? = null
@@ -42,13 +41,13 @@ class ShareObj(val shareType: SHARE_TYPE) : Serializable {
             return shareMediaObj
         }
 
-        // 分享web，打开链接
+
+
         fun buildWebObj(
-            title: String, summary: String, thumbImageBitmap: Bitmap,thumbImagePath:String, targetUrl: String
+            title: String, summary: String, thumbImageBitmap: Bitmap, targetUrl: String
         ): ShareObj {
             val shareMediaObj = ShareObj(SHARE_TYPE.SHARE_TYPE_WEB)
             shareMediaObj.init(title, summary, thumbImageBitmap, targetUrl)
-            shareMediaObj.thumbImagePath = thumbImagePath
             return shareMediaObj
         }
 
@@ -109,6 +108,13 @@ class ShareObj(val shareType: SHARE_TYPE) : Serializable {
         this.title = title
         this.summary = summary
         this.thumbImageBitmap = thumbImageBitmap
+        this.targetUrl = targetUrl
+    }
+
+    fun init(title: String, summary: String, thumbImagePath: String, targetUrl: String) {
+        this.title = title
+        this.summary = summary
+        this.thumbImagePath = thumbImagePath
         this.targetUrl = targetUrl
     }
 

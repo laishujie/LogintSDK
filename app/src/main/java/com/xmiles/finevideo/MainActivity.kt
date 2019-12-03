@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.hithway.loginsdkhelper.bean.ShareObj
+import com.hithway.loginsdkhelper.bean.QqShareObj
 import com.hithway.loginsdkhelper.callback.PLATFORM
 import com.hithway.loginsdkhelper.callback.SHARE_TAG
 import kotlinx.android.synthetic.main.activity_main.*
@@ -34,8 +35,27 @@ class MainActivity : AppCompatActivity() {
 
 
         share_btn.setOnClickListener {
+            val tag = when (radioGSharePlatform.checkedRadioButtonId) {
+                R.id.radioShareWX -> {
+                    SHARE_TAG.WEIXIN
+                }
+                R.id.radioShareWXCircle -> {
+                    SHARE_TAG.WEIXIN_CIRCLE
+                }
+                R.id.radioShareQQ -> {
+                    SHARE_TAG.QQ
+                }
+                R.id.radioShareQZone -> {
+                    SHARE_TAG.QZONE
+                }
+                R.id.radioShareSinaWB -> {
+                    SHARE_TAG.SINA_WB
+                }
+                else -> null
+            }
+
             val shareObj = when (radioGShareMedia.checkedRadioButtonId) {
-                R.id.radioShareText -> {
+               /* R.id.radioShareText -> {
                     ShareObj.buildTextObj(title, des)
                 }
                 R.id.radioShareImage -> {
@@ -45,25 +65,25 @@ class MainActivity : AppCompatActivity() {
                             R.mipmap.send_img
                         )
                     )
-                }
+                }*/
                 R.id.radioShareWeb -> {
-                    ShareObj.buildWebObj(
-                        title,
-                        des,
-                        BitmapFactory.decodeResource(resources, R.mipmap.send_img),
-                        "http://imgcache.qq.com/qzone/space_item/pre/0/66768.gif"
-                        , "http://baidu.com"
-                    )
+                    if (tag == SHARE_TAG.QQ || tag == SHARE_TAG.QZONE) {
+                        QqShareObj.buildWebObj(
+                            title,
+                            des,
+                            "http://imgcache.qq.com/qzone/space_item/pre/0/66768.gif"
+                            , "http://baidu.com"
+                        )
+                    } else {
+                        ShareObj.buildWebObj(
+                            title,
+                            des,
+                            BitmapFactory.decodeResource(resources, R.mipmap.send_img),
+                            "http://baidu.com"
+                        )
+                    }
                 }
-                R.id.radioShareTextImage -> {
-                    ShareObj.buildImageObj(
-                        BitmapFactory.decodeResource(
-                            resources,
-                            R.mipmap.send_img
-                        ), des
-                    )
-                }
-                R.id.radioShareMusic -> {
+               /* R.id.radioShareMusic -> {
                     ShareObj.buildMusicObj(
                         title,
                         des,
@@ -78,29 +98,12 @@ class MainActivity : AppCompatActivity() {
                         BitmapFactory.decodeResource(resources, R.mipmap.send_img),
                         "http://www.qq.com"
                     )
-                }
+                }*/
 
                 else -> null
             }
 
-            val tag = when (radioGSharePlatform.checkedRadioButtonId) {
-                R.id.radioShareWX -> {
-                    SHARE_TAG.WEIXIN
-                }
-                R.id.radioShareWXCircle -> {
-                    SHARE_TAG.WEIXIN_CIRCLE
-                }
-                R.id.radioShareQQ -> {
-                    SHARE_TAG.QQ
-                }
-                R.id.radioShareQZone -> {
-                    SHARE_TAG.QZONE
-                }
-                R.id.radioShareSinaWB->{
-                    SHARE_TAG.SINA_WB
-                }
-                else -> null
-            }
+
             if (tag != null && shareObj != null)
                 share(tag, shareObj)
         }

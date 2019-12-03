@@ -53,84 +53,17 @@
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@+id/text">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@+id/text">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:text="选择分享类型:"
-                android:textColor="#d5000000"
-                android:textSize="16dp" />
-
-            <RadioGroup
-                android:id="@+id/radioGShareMedia"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:orientation="vertical">
-
-                <RadioButton
-                    android:id="@+id/radioShareWeb"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="网页" />
-
-                <RadioButton
-                    android:id="@+id/radioShareText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="文字" />
-
-                <RadioButton
-                    android:id="@+id/radioShareImage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="图片" />
-
-                <RadioButton
-                    android:id="@+id/radioShareTextImage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="图文" />
-
-                <RadioButton
-                    android:id="@+id/radioShareMusic"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="音乐" />
-
-                <RadioButton
-                    android:id="@+id/radioShareVideo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="视频" />
-
-
-            </RadioGroup>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="30dp"
                 android:text="选择分享平台:"
                 android:textColor="#d5000000"
                 android:textSize="16dp" />
@@ -140,7 +73,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
                 <RadioButton
                     android:id="@+id/radioShareWX"
@@ -174,6 +107,65 @@
                     android:text="微博" />
             </RadioGroup>
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/text">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="选择分享类型:"
+                android:textColor="#d5000000"
+                android:textSize="16dp" />
+
+            <RadioGroup
+                android:id="@+id/radioGShareMedia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radioShareWeb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="网页" />
+
+                <!--<RadioButton
+                    android:id="@+id/radioShareText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="文字" />
+
+                <RadioButton
+                    android:id="@+id/radioShareImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="图片" />-->
+
+                <!--<RadioButton
+                    android:id="@+id/radioShareMusic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="音乐" />
+
+                <RadioButton
+                    android:id="@+id/radioShareVideo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="视频" />-->
+
+
+            </RadioGroup>
+        </LinearLayout>
+
+
     </LinearLayout>
 
     <Button

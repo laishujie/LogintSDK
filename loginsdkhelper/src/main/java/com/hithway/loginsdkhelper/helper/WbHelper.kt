@@ -16,6 +16,7 @@ import com.sina.weibo.sdk.auth.*
 import com.sina.weibo.sdk.auth.sso.SsoHandler
 import com.sina.weibo.sdk.share.WbShareCallback
 import com.sina.weibo.sdk.share.WbShareHandler
+import com.sina.weibo.sdk.utils.LogUtil
 import com.sina.weibo.sdk.utils.Utility
 import okhttp3.Call
 import okhttp3.Callback
@@ -35,6 +36,10 @@ class WbHelper(
     BaseSdkHelper<WBUserInfoResponse>(activity, appId, appKey, appSecret) {
 
     override fun shareWeb(shareTag: SHARE_TAG, shareObj: ShareObj) {
+        if(shareObj.thumbImageBitmap==null){
+            error?.invoke("thumbImageBitmap 为空")
+            return
+        }
         val multiMessage = WeiboMultiMessage()
         multiMessage.mediaObject =
             getWebObj(shareObj, SocialUtil.bmpToByteArray(shareObj.thumbImageBitmap, true))

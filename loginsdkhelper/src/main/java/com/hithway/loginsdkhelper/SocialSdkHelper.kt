@@ -152,7 +152,6 @@ class SocialSdkHelper private constructor(private val builder: Builder) {
                 mWbHelper?.share(shareTag, shareObj, mShareSuccessCallBack, mErrorCallBack)
             }
         }
-
     }
 
     private fun initWxHelper() {
@@ -166,7 +165,7 @@ class SocialSdkHelper private constructor(private val builder: Builder) {
     }
 
     private fun initWbHelper(){
-        mQqHelper?.onDestroy()
+        mWbHelper?.onDestroy()
         mWbHelper = WbHelper(mActivity?.get()!!, getWbAppId(), "", "", getWbRedirectUrl())
     }
 
