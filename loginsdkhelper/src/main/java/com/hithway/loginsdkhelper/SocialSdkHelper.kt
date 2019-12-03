@@ -4,9 +4,12 @@ import android.app.Activity
 import android.content.Intent
 import android.util.Log
 import com.hithway.loginsdkhelper.bean.QQUserInfoResponse
+import com.hithway.loginsdkhelper.bean.ShareObj
 import com.hithway.loginsdkhelper.bean.WBUserInfoResponse
 import com.hithway.loginsdkhelper.bean.WXUserInfoResponse
 import com.hithway.loginsdkhelper.callback.PLATFORM
+import com.hithway.loginsdkhelper.callback.SHARE_TAG
+import com.hithway.loginsdkhelper.callback.SHARE_TYPE
 import com.hithway.loginsdkhelper.helper.QqHelper
 import com.hithway.loginsdkhelper.helper.WbHelper
 import com.hithway.loginsdkhelper.helper.WxHelper
@@ -16,9 +19,7 @@ class SocialSdkHelper private constructor(private val builder: Builder) {
     private val TAG = SocialSdkHelper::class.java.name
 
     //微信帮助类
-    var mWxHelper: WxHelper? = null
-    //平台
-    var mPlatform: PLATFORM? = null
+    private var mWxHelper: WxHelper? = null
     //统一错误的回调
     private var mErrorCallBack: ((String) -> Unit?)? = null
     //当前activity
@@ -29,14 +30,26 @@ class SocialSdkHelper private constructor(private val builder: Builder) {
     private var mQQSuccessCallBack: ((QQUserInfoResponse) -> Unit?)? = null
     //微博回调
     private var mWbSuccessCallBack: ((WBUserInfoResponse) -> Unit?)? = null
-
     //qq帮助类
-    var mQqHelper: QqHelper? = null
+    private var mQqHelper: QqHelper? = null
     //微博帮助类
-    var mWbHelper: WbHelper? = null
+    private var mWbHelper: WbHelper? = null
+
+    private var mShareSuccessCallBack: (() -> Unit?)? = null
+
 
     fun getErrorCallBack(): ((String) -> Unit?)? {
         return mErrorCallBack
+    }
+
+    fun getShareSuccessCallBack(): (() -> Unit?)? {
+        return mShareSuccessCallBack
+    }
+
+
+    fun shareSuccess(share: () -> Unit): SocialSdkHelper {
+        this.mShareSuccessCallBack = share
+        return this
     }
 
     fun error(error: (errorCallBack: String) -> Unit): SocialSdkHelper {
@@ -70,15 +83,12 @@ class SocialSdkHelper private constructor(private val builder: Builder) {
         return this
     }
 
-    fun platform(platform: PLATFORM): SocialSdkHelper {
-        this.mPlatform = platform
-        return this
-    }
 
     fun wxSuccessCallBack(success: (successCallBack: WXUserInfoResponse) -> Unit): SocialSdkHelper {
         this.mWxSuccessCallBack = success
         return this
     }
+
     fun wbSuccessCallBack(success: (successCallBack: WBUserInfoResponse) -> Unit): SocialSdkHelper {
         this.mWbSuccessCallBack = success
         return this
@@ -103,21 +113,19 @@ class SocialSdkHelper private constructor(private val builder: Builder) {
     }
 
 
-    fun login() {
+    fun login(platform: PLATFORM) {
         if (mActivity == null || mActivity?.get() == null) {
             Log.e(TAG, "请绑定activity")
             return
         }
 
-        when (mPlatform) {
+        when (platform) {
             PLATFORM.WEI_XIN -> {
-                mWxHelper?.onDestroy()
-                mWxHelper = WxHelper(mActivity?.get()!!, getWxAppId(), "", getWxAppSecret())
+                initWxHelper()
                 mWxHelper?.login(mWxSuccessCallBack, mErrorCallBack)
             }
             PLATFORM.QQ -> {
-                mQqHelper?.onDestroy()
-                mQqHelper = QqHelper(mActivity?.get()!!, getQqAppId(), "", "")
+                initQqHelper()
                 mQqHelper?.login(mQQSuccessCallBack, mErrorCallBack)
             }
             PLATFORM.WEI_BO -> {
@@ -125,12 +133,34 @@ class SocialSdkHelper private constructor(private val builder: Builder) {
                 mWbHelper = WbHelper(mActivity?.get()!!, getWbAppId(), "", "", getWbRedirectUrl())
                 mWbHelper?.login(mWbSuccessCallBack, mErrorCallBack)
             }
-            else -> getErrorCallBack()?.invoke("请指定对应的平台")
         }
     }
 
 
 
+    fun share(shareTag: SHARE_TAG, shareObj: ShareObj) {
+        when (shareTag) {
+            SHARE_TAG.WEIXIN, SHARE_TAG.WEIXIN_CIRCLE -> {
+                initWxHelper()
+                mWxHelper?.share(shareTag, shareObj, mShareSuccessCallBack, mErrorCallBack)
+            }
+            SHARE_TAG.QQ,SHARE_TAG.QZONE->{
+                initQqHelper()
+                mQqHelper?.share(shareTag, shareObj, mShareSuccessCallBack, mErrorCallBack)
+            }
+        }
+
+    }
+
+    private fun initWxHelper() {
+        mWxHelper?.onDestroy()
+        mWxHelper = WxHelper(mActivity?.get()!!, getWxAppId(), "", getWxAppSecret())
+    }
+
+    private fun initQqHelper() {
+        mQqHelper?.onDestroy()
+        mQqHelper = QqHelper(mActivity?.get()!!, getQqAppId(), "", "")
+    }
 
 
     class Builder {

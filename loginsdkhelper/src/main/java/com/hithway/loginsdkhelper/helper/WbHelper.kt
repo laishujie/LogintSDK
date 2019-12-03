@@ -5,7 +5,9 @@ import android.content.Intent
 import android.text.TextUtils
 import android.util.Log
 import com.google.gson.Gson
+import com.hithway.loginsdkhelper.bean.ShareObj
 import com.hithway.loginsdkhelper.bean.WBUserInfoResponse
+import com.hithway.loginsdkhelper.callback.SHARE_TAG
 import com.sina.weibo.sdk.WbSdk
 import com.sina.weibo.sdk.auth.*
 import com.sina.weibo.sdk.auth.sso.SsoHandler
@@ -24,6 +26,24 @@ class WbHelper(
     redirectUrl: String?
 ) :
     BaseSdkHelper<WBUserInfoResponse>(activity, appId, appKey, appSecret) {
+    override fun shareWeb(shareTag: SHARE_TAG, shareObj: ShareObj) {
+
+    }
+
+    override fun shareImage(shareTag: SHARE_TAG, shareObj: ShareObj) {
+    }
+
+    override fun shareMusic(shareTag: SHARE_TAG, shareObj: ShareObj) {
+    }
+
+    override fun shareOpenApp() {
+    }
+
+    override fun shareText(shareTag: SHARE_TAG, shareObj: ShareObj) {
+    }
+
+    override fun shareVideo(shareTag: SHARE_TAG, shareObj: ShareObj) {
+    }
 
     private var initOk = false
 

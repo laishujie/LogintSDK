@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.hithway.loginsdkhelper.SocialSdkHelper
 import com.hithway.loginsdkhelper.bean.WXUserInfoResponse
+import com.tencent.mm.opensdk.constants.ConstantsAPI
 import com.tencent.mm.opensdk.modelbase.BaseReq
 import com.tencent.mm.opensdk.modelbase.BaseResp
 import com.tencent.mm.opensdk.modelmsg.SendAuth
@@ -19,6 +20,7 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
+
 
 /**
  *
@@ -43,33 +45,52 @@ abstract class BaseWXEntryActivity : AppCompatActivity(), IWXAPIEventHandler {
     override fun onResp(baseResp: BaseResp?) {
         baseResp?.apply {
             Log.d("WXEntryActivity", baseResp.errCode.toString() + baseResp.errStr)
-            when (baseResp.errCode) {
-                BaseResp.ErrCode.ERR_OK -> {
-                    val appSecret = getSocialSdkHelper().getWxAppSecret()
-                    val appId = getSocialSdkHelper().getWxAppId()
-                    val code = (baseResp as SendAuth.Resp).code
-                    val authUrl = StringBuilder()
-                    authUrl
-                        .append("https://api.weixin.qq.com/sns/oauth2/access_token?appid=")
-                        .append(appId)
-                        .append("&secret=")
-                        .append(appSecret)
-                        .append("&code=")
-                        .append(code)
-                        .append("&grant_type=authorization_code")
-                    getAuth(authUrl.toString())
-                }
-                //用户拒绝授权
-                BaseResp.ErrCode.ERR_AUTH_DENIED -> {
-                    getSocialSdkHelper().getErrorCallBack()?.invoke("拒绝授权")
-                    finish()
-                }
-                BaseResp.ErrCode.ERR_USER_CANCEL -> {//用户取消
-                    getSocialSdkHelper().getErrorCallBack()?.invoke("用户取消")
 
-                    finish()
+            if (baseResp.type == ConstantsAPI.COMMAND_SENDAUTH) {
+                when (baseResp.errCode) {
+                    BaseResp.ErrCode.ERR_OK -> {
+                        val appSecret = getSocialSdkHelper().getWxAppSecret()
+                        val appId = getSocialSdkHelper().getWxAppId()
+                        val code = (baseResp as SendAuth.Resp).code
+                        val authUrl = StringBuilder()
+                        authUrl
+                            .append("https://api.weixin.qq.com/sns/oauth2/access_token?appid=")
+                            .append(appId)
+                            .append("&secret=")
+                            .append(appSecret)
+                            .append("&code=")
+                            .append(code)
+                            .append("&grant_type=authorization_code")
+                        getAuth(authUrl.toString())
+                    }
+                    //用户拒绝授权
+                    BaseResp.ErrCode.ERR_AUTH_DENIED -> {
+                        getSocialSdkHelper().getErrorCallBack()?.invoke("拒绝授权")
+                        finish()
+                    }
+                    BaseResp.ErrCode.ERR_USER_CANCEL -> {//用户取消
+                        getSocialSdkHelper().getErrorCallBack()?.invoke("用户取消")
+                        finish()
+                    }
+                    else -> finish()
                 }
-                else -> finish()
+            }else if (baseResp.type == ConstantsAPI.COMMAND_SENDMESSAGE_TO_WX) {
+                // 取消分享也算分享成功 https://open.weixin.qq.com/cgi-bin/announce?spm=a311a.9588098.0.0&action=getannouncement&key=11534138374cE6li&version=
+                when (baseResp.errCode) {
+                    BaseResp.ErrCode.ERR_OK ->
+                        getSocialSdkHelper().getShareSuccessCallBack()?.invoke()
+                    // 分享成功
+                    BaseResp.ErrCode.ERR_USER_CANCEL ->
+                        // 分享取消
+                        getSocialSdkHelper().getErrorCallBack()?.invoke("分享取消")
+                    BaseResp.ErrCode.ERR_SENT_FAILED ->
+                        // 分享失败
+                        getSocialSdkHelper().getErrorCallBack()?.invoke("分享失败")
+                    BaseResp.ErrCode.ERR_AUTH_DENIED ->
+                        // 分享被拒绝
+                        getSocialSdkHelper().getErrorCallBack()?.invoke("分享被拒绝")
+                }
+                finish()
             }
         }
     }

@@ -4,8 +4,11 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.text.TextUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
@@ -18,6 +21,10 @@ import javax.net.ssl.HttpsURLConnection;
  * Desc：
  */
 public final class SocialUtil {
+    public static final String QQ_PKG = "com.tencent.mobileqq";
+    public static final String WECHAT_PKG = "com.tencent.mm";
+    public static final String SINA_PKG = "com.sina.weibo";
+    public static final String QQ_FRIENDS_PAGE = "com.tencent.mobileqq.activity.JumpActivity";//qq选择好友、群、我的电脑
 
     static String get(URL url) throws Exception {
         HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
@@ -56,11 +63,11 @@ public final class SocialUtil {
         return "m".equals(gender) ? "M" : "F";
     }
 
-    static String buildTransaction(String type) {
+   public static String buildTransaction(String type) {
         return (type == null) ? String.valueOf(System.currentTimeMillis()) : type + System.currentTimeMillis();
     }
 
-    static byte[] bmpToByteArray(final Bitmap bmp, boolean needThumb) {
+   public static byte[] bmpToByteArray(final Bitmap bmp, boolean needThumb) {
         Bitmap newBmp;
         if (needThumb) {
             int width = bmp.getWidth();
@@ -97,6 +104,45 @@ public final class SocialUtil {
     }
 
     /**
+     * 通过图片头获取图片文件的扩展名
+     *
+     * @param saveFile
+     * @return
+     */
+    public static String getImageFileEndName(File saveFile) {
+
+
+        if (saveFile != null && saveFile.exists()) {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(saveFile.getAbsolutePath(), options);
+            String miniType = options.outMimeType;
+            if (miniType != null && miniType.startsWith("image/")) {
+                return miniType.replaceFirst("image/", "");
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param path 路径
+     * @return 是否是 gif 文件
+     */
+    public static boolean isGifFile(String path) {
+        return isGIFImage(new File(path));
+    }
+    /**
+     * 通过文件头判断图片是否为GIF
+     *
+     * @param imagePath File类型传参
+     * @return
+     */
+    public static boolean isGIFImage(File imagePath) {
+        String endName = getImageFileEndName(imagePath);
+        return !TextUtils.isEmpty(endName) && endName.toUpperCase().contains("GIF");
+    }
+
+    /**
      * 是否安装qq
      */
     static boolean isQQInstalled(Context context) {
@@ -112,4 +158,6 @@ public final class SocialUtil {
         }
         return false;
     }
+
+
 }
