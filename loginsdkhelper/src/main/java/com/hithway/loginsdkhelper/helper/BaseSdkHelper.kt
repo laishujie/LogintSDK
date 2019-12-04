@@ -2,6 +2,7 @@ package com.hithway.loginsdkhelper.helper
 
 import android.app.Activity
 import android.content.Intent
+import android.util.Log
 import com.hithway.loginsdkhelper.bean.ShareObj
 import com.hithway.loginsdkhelper.callback.IRequestHelper
 import com.hithway.loginsdkhelper.callback.SHARE_TAG
@@ -21,8 +22,7 @@ abstract class BaseSdkHelper<T>(
     val appId: String?,
     val appKey: String?,
     val appSecret: String?
-) :
-    IRequestHelper<T> {
+) : IRequestHelper<T> {
 
     private val mActivityWeakReference: WeakReference<Activity> = WeakReference(activity)
     protected var success: ((T) -> Unit)? = null
@@ -55,9 +55,9 @@ abstract class BaseSdkHelper<T>(
         return success
     }
 
-   fun getShareSuccessCallBck():(() -> Unit)?{
-       return shareSuccessCallBack
-   }
+    fun getShareSuccessCallBck(): (() -> Unit)? {
+        return shareSuccessCallBack
+    }
 
     fun getErrorCallBack(): ((String) -> Unit)? {
         return error
@@ -76,9 +76,9 @@ abstract class BaseSdkHelper<T>(
     fun onDestroy() {
         destroy()
         mActivityWeakReference.clear()
-        error=null
-        shareSuccessCallBack=null
-        success=null
+        error = null
+        shareSuccessCallBack = null
+        success = null
     }
 
     protected open fun destroy() {}
@@ -103,6 +103,7 @@ abstract class BaseSdkHelper<T>(
             SHARE_TYPE.SHARE_TYPE_VIDEO -> {
                 shareVideo(shareTag, shareObj)
             }
+            else -> Log.e("", "")
         }
     }
 

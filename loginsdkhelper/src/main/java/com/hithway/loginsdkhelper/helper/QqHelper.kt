@@ -22,6 +22,8 @@ import java.util.ArrayList
 import java.io.File
 
 
+
+
 /**
  *
  * @author  Lai
@@ -293,6 +295,9 @@ class QqHelper(activity: Activity, appId: String?, appKey: String?, appSecret: S
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode == IntentShareUtils.SHARE_REQ_CODE){
+            return
+        }
         mILoginListener?.apply {
             Tencent.onActivityResultData(requestCode, resultCode, data, this)
         }

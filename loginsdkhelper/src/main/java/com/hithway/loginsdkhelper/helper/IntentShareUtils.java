@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class IntentShareUtils {
 
-    public static final int SHARE_REQ_CODE = 0x123;
+    public static final int SHARE_REQ_CODE = 0x124;
 
     public static void shareText(Activity activity, String title, String text, String pkg, String targetActivity) throws Exception {
         Intent sendIntent = new Intent();

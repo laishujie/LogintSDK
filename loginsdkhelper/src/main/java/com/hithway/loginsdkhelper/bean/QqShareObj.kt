@@ -1,6 +1,5 @@
 package com.hithway.loginsdkhelper.bean
 
-import android.graphics.Bitmap
 import com.hithway.loginsdkhelper.callback.SHARE_TYPE
 
 class QqShareObj(shareType: SHARE_TYPE) : ShareObj(shareType) {
