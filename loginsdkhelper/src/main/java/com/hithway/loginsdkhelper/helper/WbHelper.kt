@@ -10,6 +10,8 @@ import com.hithway.loginsdkhelper.bean.ShareObj
 import com.hithway.loginsdkhelper.bean.WBUserInfoResponse
 import com.hithway.loginsdkhelper.callback.SHARE_TAG
 import com.sina.weibo.sdk.WbSdk
+import com.sina.weibo.sdk.api.ImageObject
+import com.sina.weibo.sdk.api.TextObject
 import com.sina.weibo.sdk.api.WebpageObject
 import com.sina.weibo.sdk.api.WeiboMultiMessage
 import com.sina.weibo.sdk.auth.*
@@ -35,6 +37,8 @@ class WbHelper(
 ) :
     BaseSdkHelper<WBUserInfoResponse>(activity, appId, appKey, appSecret) {
 
+     val THUMB_IMAGE_SIZE = 32 * 1024
+
     override fun shareWeb(shareTag: SHARE_TAG, shareObj: ShareObj) {
         if(shareObj.thumbImageBitmap==null){
             error?.invoke("thumbImageBitmap 为空")
@@ -49,6 +53,23 @@ class WbHelper(
     }
 
     override fun shareImage(shareTag: SHARE_TAG, shareObj: ShareObj) {
+        if(shareObj.thumbImageBitmap==null){
+            error?.invoke("thumbImageBitmap 为空")
+            return
+        }
+
+        val thumbData = SocialUtil.bmpToByteArray(shareObj.thumbImageBitmap, true)
+
+        if (thumbData != null && thumbData.size > THUMB_IMAGE_SIZE) {
+            error?.invoke("图片太大，分享失败。")
+            return
+        }
+        getActivity()?.apply {
+            val multiMessage = WeiboMultiMessage()
+            multiMessage.imageObject = getImageObj(shareObj.thumbImagePath, thumbData)
+            multiMessage.textObject = getTextObj(shareObj.summary!!)
+            sendWeiboMultiMsg(this, multiMessage)
+        }
     }
 
     override fun shareMusic(shareTag: SHARE_TAG, shareObj: ShareObj) {
@@ -58,6 +79,34 @@ class WbHelper(
     }
 
     override fun shareText(shareTag: SHARE_TAG, shareObj: ShareObj) {
+        if(TextUtils.isEmpty(shareObj.summary)){
+            error?.invoke("shareObj.summary is null")
+            return
+        }
+        getActivity()?.apply {
+            val multiMessage = WeiboMultiMessage()
+            multiMessage.textObject = getTextObj(shareObj.summary!!)
+            sendWeiboMultiMsg(this, multiMessage)
+        }
+    }
+
+
+    private fun getImageObj(localPath: String?, data: ByteArray?): ImageObject? {
+        if (TextUtils.isEmpty(localPath) || data == null) return null
+
+        val imageObject = ImageObject()
+        //设置缩略图。 注意：最终压缩过的缩略图大小不得超过 32kb。
+        imageObject.imageData = data
+        imageObject.imagePath = localPath
+        return imageObject
+    }
+
+    private fun getTextObj(summary: String): TextObject? {
+        if (TextUtils.isEmpty(summary)) return null
+
+        val textObject = TextObject()
+        textObject.text = summary
+        return textObject
     }
 
     override fun shareVideo(shareTag: SHARE_TAG, shareObj: ShareObj) {

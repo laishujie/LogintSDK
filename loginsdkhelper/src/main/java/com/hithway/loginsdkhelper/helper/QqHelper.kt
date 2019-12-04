@@ -18,6 +18,7 @@ import com.hithway.loginsdkhelper.SocialUtil
 import com.hithway.loginsdkhelper.bean.ShareObj
 import com.tencent.connect.share.QQShare
 import java.util.ArrayList
+import java.io.File
 
 
 /**
@@ -32,7 +33,7 @@ class QqHelper(activity: Activity, appId: String?, appKey: String?, appSecret: S
     BaseSdkHelper<QQUserInfoResponse>(activity, appId, appKey, appSecret) {
 
     override fun shareWeb(shareTag: SHARE_TAG, shareObj: ShareObj) {
-        if(shareTag == SHARE_TAG.QQ){
+        if (shareTag == SHARE_TAG.QQ) {
             // 分享图文
             val params =
                 buildCommonBundle(shareObj.title, shareObj.summary, shareObj.targetUrl)
@@ -41,8 +42,8 @@ class QqHelper(activity: Activity, appId: String?, appKey: String?, appSecret: S
             if (!TextUtils.isEmpty(shareObj.thumbImagePath))
                 params.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, shareObj.thumbImagePath)
 
-            mTencent.shareToQQ(getActivity(),params,mIShareListener)
-        }else{
+            mTencent.shareToQQ(getActivity(), params, mIShareListener)
+        } else {
             val imageUrls = ArrayList<String>()
             val params = Bundle()
             params.putInt(
@@ -53,7 +54,7 @@ class QqHelper(activity: Activity, appId: String?, appKey: String?, appSecret: S
             params.putString(QzoneShare.SHARE_TO_QQ_TITLE, shareObj.title)
             params.putString(QzoneShare.SHARE_TO_QQ_TARGET_URL, shareObj.targetUrl)
 
-            if(!TextUtils.isEmpty(shareObj.thumbImagePath)){
+            if (!TextUtils.isEmpty(shareObj.thumbImagePath)) {
                 imageUrls.add(shareObj.thumbImagePath!!)
             }
             params.putStringArrayList(QzoneShare.SHARE_TO_QQ_IMAGE_URL, imageUrls)
@@ -62,6 +63,31 @@ class QqHelper(activity: Activity, appId: String?, appKey: String?, appSecret: S
     }
 
     override fun shareImage(shareTag: SHARE_TAG, shareObj: ShareObj) {
+        if (TextUtils.isEmpty(shareObj.thumbImagePath)) {
+            error?.invoke("thumbImagePath 分享图片路径不能为空")
+            return
+        }
+        if (!File(shareObj.thumbImagePath!!).isFile) {
+            error?.invoke("分享图片必须是本地图片")
+            return
+        }
+        if (shareTag == SHARE_TAG.QQ) {
+            val params = Bundle()
+            params.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, shareObj.thumbImagePath)
+            params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_IMAGE)
+            mTencent.shareToQQ(getActivity(), params, mIShareListener)
+        } else if (shareTag == SHARE_TAG.QZONE) {
+            val params = Bundle()
+            params.putInt(
+                QzoneShare.SHARE_TO_QZONE_KEY_TYPE,
+                QzonePublish.PUBLISH_TO_QZONE_TYPE_PUBLISHMOOD
+            )
+            params.putString(QzoneShare.SHARE_TO_QQ_SUMMARY, shareObj.summary)
+            val imageUrls = ArrayList<String>()
+            imageUrls.add(shareObj.thumbImagePath!!)
+            params.putStringArrayList(QzonePublish.PUBLISH_TO_QZONE_IMAGE_URL, imageUrls)
+            mTencent.publishToQzone(getActivity(), params, mIShareListener)
+        }
     }
 
 
@@ -147,7 +173,6 @@ class QqHelper(activity: Activity, appId: String?, appKey: String?, appSecret: S
         } catch (e: Exception) {
             error?.invoke("跳转失败")
         }
-
     }
 
     override fun shareVideo(shareTag: SHARE_TAG, shareObj: ShareObj) {

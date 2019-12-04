@@ -15,11 +15,6 @@ import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 
-/**
- * Created by arvinljw on 17/11/27 15:37
- * Function：
- * Desc：
- */
 public final class SocialUtil {
     public static final String QQ_PKG = "com.tencent.mobileqq";
     public static final String WECHAT_PKG = "com.tencent.mm";
