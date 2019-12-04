@@ -36,12 +36,17 @@ class WbHelper(
     redirectUrl: String?
 ) :
     BaseSdkHelper<WBUserInfoResponse>(activity, appId, appKey, appSecret) {
-
+    //分享的图片大小
      val THUMB_IMAGE_SIZE = 32 * 1024
+    private val TAG = javaClass.name
+    //是否初始化成功
+    private var initOk = false
 
+    private var mSsoHandler: SsoHandler? = null
     override fun shareWeb(shareTag: SHARE_TAG, shareObj: ShareObj) {
         if(shareObj.thumbImageBitmap==null){
-            error?.invoke("thumbImageBitmap 为空")
+            Log.e(TAG,"thumbImageBitmap is null")
+            //error?.invoke("thumbImageBitmap 为空")
             return
         }
         val multiMessage = WeiboMultiMessage()
@@ -54,7 +59,8 @@ class WbHelper(
 
     override fun shareImage(shareTag: SHARE_TAG, shareObj: ShareObj) {
         if(shareObj.thumbImageBitmap==null){
-            error?.invoke("thumbImageBitmap 为空")
+            Log.e(TAG,"thumbImageBitmap is null")
+            //error?.invoke("thumbImageBitmap 为空")
             return
         }
 
@@ -80,7 +86,7 @@ class WbHelper(
 
     override fun shareText(shareTag: SHARE_TAG, shareObj: ShareObj) {
         if(TextUtils.isEmpty(shareObj.summary)){
-            error?.invoke("shareObj.summary is null")
+            Log.e(TAG,"shareObj.summary is null")
             return
         }
         getActivity()?.apply {
@@ -112,9 +118,7 @@ class WbHelper(
     override fun shareVideo(shareTag: SHARE_TAG, shareObj: ShareObj) {
     }
 
-    private var initOk = false
 
-    private var mSsoHandler: SsoHandler? = null
 
     init {
         initOk = if (TextUtils.isEmpty(appId) || TextUtils.isEmpty(redirectUrl)) {
@@ -131,11 +135,11 @@ class WbHelper(
     override fun share(
         shareTag: SHARE_TAG,
         shareObj: ShareObj,
-        success: (() -> Unit?)?,
-        error: ((String) -> Unit?)?
+        success: (() -> Unit)?,
+        error: ((String) -> Unit)?
     ) {
         if(!initOk){
-            error?.invoke("appId 或者 redirectUrl 为空")
+            Log.e(TAG,"appId or redirectUrl is null")
             return
         }
         super.share(shareTag, shareObj, success, error)
@@ -213,6 +217,7 @@ class WbHelper(
         })
     }
 
+
     override fun login() {
         getActivity()?.apply {
             if (initOk) {
@@ -244,7 +249,8 @@ class WbHelper(
 
                 })
             } else {
-                error?.invoke("appId 或者 redirectUrl 为空")
+                Log.e(TAG,"appId or redirectUrl is null")
+                //error?.invoke("appId 或者 redirectUrl 为空")
             }
         }
     }

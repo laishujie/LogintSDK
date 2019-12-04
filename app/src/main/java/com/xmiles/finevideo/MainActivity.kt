@@ -1,23 +1,17 @@
 package com.xmiles.finevideo
 
 import android.Manifest
-import android.app.Activity
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.os.Environment
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.hithway.loginsdkhelper.bean.ShareObj
 import com.hithway.loginsdkhelper.bean.QqShareObj
-import com.hithway.loginsdkhelper.callback.PLATFORM
+import com.hithway.loginsdkhelper.bean.ShareObj
 import com.hithway.loginsdkhelper.callback.SHARE_TAG
 import com.xmiles.finevideo.utils.EasyPermissions
 import com.xmiles.finevideo.utils.EasyPhoto
-import com.xmiles.finevideo.utils.PermissionAlwaysDenyNotifier
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
@@ -25,21 +19,41 @@ class MainActivity : AppCompatActivity() {
     private val mSocialSdkHelper by lazy { (application as App).getSocialSdkHelper() }
     private val title = "title"
     private val des = "描述描述描述描述描述描述描述描述描述描述描述描述"
-
+    private val tagUrl = "https://baidu.com"
     private var mShareTag: SHARE_TAG? = null
+
+    private var isShareImage = false
 
     // 创建EasyPhoto实例
     private val photo = EasyPhoto()
         .setCallback {
             val shareObj = when (mShareTag) {
                 SHARE_TAG.QQ, SHARE_TAG.QZONE -> {
-                    QqShareObj.buildLocalImageObj(des, it.absolutePath)
+                    if (isShareImage) {
+                        QqShareObj.buildLocalImageObj(des, it.absolutePath)
+                    } else {
+                        QqShareObj.buildWebObj(
+                            title,
+                            des,
+                            it.absolutePath,
+                            tagUrl
+                        )
+                    }
                 }
                 SHARE_TAG.WEIXIN, SHARE_TAG.WEIXIN_CIRCLE, SHARE_TAG.SINA_WB -> {
-                    ShareObj.buildImageObj(
-                        BitmapFactory.decodeFile(it.absolutePath),
-                        des
-                    )
+                    if (isShareImage) {
+                        ShareObj.buildImageObj(
+                            BitmapFactory.decodeFile(it.absolutePath),
+                            des
+                        )
+                    } else {
+                        ShareObj.buildWebObj(
+                            title,
+                            des,
+                            BitmapFactory.decodeFile(it.absolutePath),
+                            tagUrl
+                        )
+                    }
                 }
                 else -> null
             }
@@ -48,6 +62,7 @@ class MainActivity : AppCompatActivity() {
                 share(mShareTag!!, shareObj)
         }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -55,13 +70,31 @@ class MainActivity : AppCompatActivity() {
         requestPermissions()
 
         btn_.setOnClickListener {
-            login(PLATFORM.WEI_XIN)
+            mSocialSdkHelper
+                .withActivity(this)
+                .wx()
+                .login({
+                    dialogText(it.toString())
+                }, {
+                    dialogText(it)
+                })
         }
         btn_qq.setOnClickListener {
-            login(PLATFORM.QQ)
+            mSocialSdkHelper.withActivity(this)
+                .qq().login({
+                    dialogText(it.toString())
+                }, {
+                    dialogText(it)
+                })
         }
+
         btn_wb.setOnClickListener {
-            login(PLATFORM.WEI_BO)
+            mSocialSdkHelper.withActivity(this)
+                .wb().login({
+                    dialogText(it.toString())
+                }, {
+                    dialogText(it)
+                })
         }
 
 
@@ -85,31 +118,19 @@ class MainActivity : AppCompatActivity() {
                 else -> null
             }
 
-            if (radioGShareMedia.checkedRadioButtonId == R.id.radioShareImage) {
+            isShareImage = radioGShareMedia.checkedRadioButtonId == R.id.radioShareImage
+
+            if (radioGShareMedia.checkedRadioButtonId == R.id.radioShareImage
+                || radioGShareMedia.checkedRadioButtonId == R.id.radioShareWeb
+            ) {
                 photo.selectPhoto(this)
                 return@setOnClickListener
             }
 
+
             val shareObj = when (radioGShareMedia.checkedRadioButtonId) {
                 R.id.radioShareText -> {
                     ShareObj.buildTextObj(title, des)
-                }
-                R.id.radioShareWeb -> {
-                    if (mShareTag == SHARE_TAG.QQ || mShareTag == SHARE_TAG.QZONE) {
-                        QqShareObj.buildWebObj(
-                            title,
-                            des,
-                            "http://imgcache.qq.com/qzone/space_item/pre/0/66768.gif"
-                            , "http://baidu.com"
-                        )
-                    } else {
-                        ShareObj.buildWebObj(
-                            title,
-                            des,
-                            BitmapFactory.decodeResource(resources, R.mipmap.send_img),
-                            "http://baidu.com"
-                        )
-                    }
                 }
                 else -> null
             }
@@ -143,34 +164,41 @@ class MainActivity : AppCompatActivity() {
             .request(this)
     }
 
-
-    private fun login(platform: PLATFORM) {
-        mSocialSdkHelper.withActivity(this)
-            .error {
-                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
-            }
-            .qqSuccessCallBack {
-                text.text = it.toString()
-            }
-            .wxSuccessCallBack {
-                text.text = it.toString()
-            }
-            .wbSuccessCallBack {
-                text.text = it.toString()
-            }
-            .login(platform)
+    private fun dialogText(str: String) {
+        AlertDialog.Builder(this)
+            .setMessage(str)
+            .show()
     }
 
     //TODO 微信平台规定 取消分享也算分享成功 https://open.weixin.qq.com/cgi-bin/announce?spm=a311a.9588098.0.0&action=getannouncement&key=11534138374cE6li&version=
     private fun share(shareTag: SHARE_TAG, shareObj: ShareObj) {
-        mSocialSdkHelper.withActivity(this)
-            .error {
-                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+        when (shareTag) {
+            SHARE_TAG.WEIXIN_CIRCLE, SHARE_TAG.WEIXIN -> {
+                mSocialSdkHelper.withActivity(this)
+                    .wx().share(shareTag, shareObj, {
+                        dialogText("分享成功")
+                    }, {
+                        dialogText(it)
+                    })
             }
-            .shareSuccess {
-                Toast.makeText(this, "分享成功", Toast.LENGTH_LONG).show()
+            SHARE_TAG.QQ, SHARE_TAG.QZONE -> {
+                mSocialSdkHelper.withActivity(this)
+                    .qq().share(shareTag, shareObj, {
+                        dialogText("分享成功")
+                    }, {
+                        dialogText(it)
+                    })
             }
-            .share(shareTag, shareObj)
+            SHARE_TAG.SINA_WB -> {
+                mSocialSdkHelper.withActivity(this)
+                    .wb().share(shareTag, shareObj, {
+                        dialogText("分享成功")
+                    }, {
+                        dialogText(it)
+                    })
+            }
+        }
+
     }
 
 

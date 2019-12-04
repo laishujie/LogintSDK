@@ -25,18 +25,42 @@ abstract class BaseSdkHelper<T>(
     IRequestHelper<T> {
 
     private val mActivityWeakReference: WeakReference<Activity> = WeakReference(activity)
-    var success: ((T) -> Unit?)? = null
-    var error: ((String) -> Unit?)? = null
-    var shareSuccessCallBack: (() -> Unit?)? = null
+    protected var success: ((T) -> Unit)? = null
+    protected var error: ((String) -> Unit)? = null
+    protected var shareSuccessCallBack: (() -> Unit)? = null
 
     fun getActivity(): Activity? {
         return mActivityWeakReference.get()
     }
 
-    override fun login(success: ((T) -> Unit?)?, error: ((String) -> Unit?)?) {
+    override fun login(success: ((T) -> Unit)?, error: ((String) -> Unit)?) {
         this.success = success
         this.error = error
         login()
+    }
+
+    override fun share(
+        shareTag: SHARE_TAG,
+        shareObj: ShareObj,
+        success: (() -> Unit)?,
+        error: ((String) -> Unit)?
+    ) {
+        this.shareSuccessCallBack = success
+        this.error = error
+        share(shareTag, shareObj)
+    }
+
+
+    fun getSuccessCallBack(): ((T) -> Unit)? {
+        return success
+    }
+
+   fun getShareSuccessCallBck():(() -> Unit)?{
+       return shareSuccessCallBack
+   }
+
+    fun getErrorCallBack(): ((String) -> Unit)? {
+        return error
     }
 
 
@@ -44,30 +68,22 @@ abstract class BaseSdkHelper<T>(
 
     }
 
-    override fun share(
-        shareTag: SHARE_TAG,
-        shareObj: ShareObj,
-        success: (() -> Unit?)?,
-        error: ((String) -> Unit?)?
-    ) {
-        this.shareSuccessCallBack = success
-        this.error = error
-        share(shareTag, shareObj)
-    }
-
-    abstract fun login()
+    protected abstract fun login()
 
     open fun logout(activity: Activity) {}
 
 
     fun onDestroy() {
-        mActivityWeakReference.clear()
         destroy()
+        mActivityWeakReference.clear()
+        error=null
+        shareSuccessCallBack=null
+        success=null
     }
 
-    protected open fun destroy(){}
+    protected open fun destroy() {}
 
-   protected open fun share(shareTag: SHARE_TAG, shareObj: ShareObj) {
+    protected open fun share(shareTag: SHARE_TAG, shareObj: ShareObj) {
         when (shareObj.shareType) {
             SHARE_TYPE.SHARE_TYPE_TEXT -> {
                 shareText(shareTag, shareObj)
@@ -90,15 +106,15 @@ abstract class BaseSdkHelper<T>(
         }
     }
 
-    abstract fun shareWeb(shareTag: SHARE_TAG, shareObj: ShareObj)
+    protected abstract fun shareWeb(shareTag: SHARE_TAG, shareObj: ShareObj)
 
-    abstract fun shareImage(shareTag: SHARE_TAG, shareObj: ShareObj)
+    protected abstract fun shareImage(shareTag: SHARE_TAG, shareObj: ShareObj)
 
-    abstract fun shareMusic(shareTag: SHARE_TAG, shareObj: ShareObj)
+    protected abstract fun shareMusic(shareTag: SHARE_TAG, shareObj: ShareObj)
 
-    abstract fun shareOpenApp()
+    protected abstract fun shareOpenApp()
 
-    abstract fun shareText(shareTag: SHARE_TAG, shareObj: ShareObj)
+    protected abstract fun shareText(shareTag: SHARE_TAG, shareObj: ShareObj)
 
-    abstract fun shareVideo(shareTag: SHARE_TAG, shareObj: ShareObj)
+    protected abstract fun shareVideo(shareTag: SHARE_TAG, shareObj: ShareObj)
 }

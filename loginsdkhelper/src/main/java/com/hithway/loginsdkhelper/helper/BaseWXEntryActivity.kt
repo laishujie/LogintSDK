@@ -65,11 +65,11 @@ abstract class BaseWXEntryActivity : AppCompatActivity(), IWXAPIEventHandler {
                     }
                     //用户拒绝授权
                     BaseResp.ErrCode.ERR_AUTH_DENIED -> {
-                        getSocialSdkHelper().getErrorCallBack()?.invoke("拒绝授权")
+                        getSocialSdkHelper().getWxHelper()?.getErrorCallBack()?.invoke("拒绝授权")
                         finish()
                     }
                     BaseResp.ErrCode.ERR_USER_CANCEL -> {//用户取消
-                        getSocialSdkHelper().getErrorCallBack()?.invoke("用户取消")
+                        getSocialSdkHelper().getWxHelper()?.getErrorCallBack()?.invoke("用户取消")
                         finish()
                     }
                     else -> finish()
@@ -78,17 +78,17 @@ abstract class BaseWXEntryActivity : AppCompatActivity(), IWXAPIEventHandler {
                 // 取消分享也算分享成功 https://open.weixin.qq.com/cgi-bin/announce?spm=a311a.9588098.0.0&action=getannouncement&key=11534138374cE6li&version=
                 when (baseResp.errCode) {
                     BaseResp.ErrCode.ERR_OK ->
-                        getSocialSdkHelper().getShareSuccessCallBack()?.invoke()
+                        getSocialSdkHelper().getWxHelper()?.getShareSuccessCallBck()?.invoke()
                     // 分享成功
                     BaseResp.ErrCode.ERR_USER_CANCEL ->
                         // 分享取消
-                        getSocialSdkHelper().getErrorCallBack()?.invoke("分享取消")
+                        getSocialSdkHelper().getWxHelper()?.getErrorCallBack()?.invoke("分享取消")
                     BaseResp.ErrCode.ERR_SENT_FAILED ->
                         // 分享失败
-                        getSocialSdkHelper().getErrorCallBack()?.invoke("分享失败")
+                        getSocialSdkHelper().getWxHelper()?.getErrorCallBack()?.invoke("分享失败")
                     BaseResp.ErrCode.ERR_AUTH_DENIED ->
                         // 分享被拒绝
-                        getSocialSdkHelper().getErrorCallBack()?.invoke("分享被拒绝")
+                        getSocialSdkHelper().getWxHelper()?.getErrorCallBack()?.invoke("分享被拒绝")
                 }
                 finish()
             }
@@ -101,7 +101,7 @@ abstract class BaseWXEntryActivity : AppCompatActivity(), IWXAPIEventHandler {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call?, e: IOException?) {
                 runOnUiThread {
-                    getSocialSdkHelper().getErrorCallBack()?.invoke("微信验证失败")
+                    getSocialSdkHelper().getWxHelper()?.getErrorCallBack()?.invoke("微信验证失败")
                 }
             }
 
@@ -137,7 +137,7 @@ abstract class BaseWXEntryActivity : AppCompatActivity(), IWXAPIEventHandler {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call?, e: IOException?) {
                 runOnUiThread {
-                    getSocialSdkHelper().getErrorCallBack()?.invoke("获取用户信息失败")
+                    getSocialSdkHelper().getWxHelper()?.getErrorCallBack()?.invoke("获取用户信息失败")
                 }
                 finish()
             }
@@ -146,8 +146,8 @@ abstract class BaseWXEntryActivity : AppCompatActivity(), IWXAPIEventHandler {
                 response?.body()?.string()?.apply {
                     val loginResponse = Gson().fromJson(this, WXUserInfoResponse::class.java)
                     runOnUiThread {
-                        getSocialSdkHelper().getWxSuccessCallBack()
-                            ?.invoke(loginResponse)
+                        getSocialSdkHelper().getWxHelper()
+                            ?.getSuccessCallBack()?.invoke(loginResponse)
                         finish()
                     }
                 }

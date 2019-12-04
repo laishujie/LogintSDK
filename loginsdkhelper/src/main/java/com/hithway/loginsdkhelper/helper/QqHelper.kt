@@ -14,6 +14,7 @@ import com.tencent.tauth.UiError
 import com.tencent.connect.share.QzoneShare
 import com.tencent.connect.share.QzonePublish
 import android.os.Bundle
+import android.util.Log
 import com.hithway.loginsdkhelper.SocialUtil
 import com.hithway.loginsdkhelper.bean.ShareObj
 import com.tencent.connect.share.QQShare
@@ -31,6 +32,16 @@ import java.io.File
  */
 class QqHelper(activity: Activity, appId: String?, appKey: String?, appSecret: String?) :
     BaseSdkHelper<QQUserInfoResponse>(activity, appId, appKey, appSecret) {
+
+    private val TAG = javaClass.name
+    private val mTencent: Tencent = Tencent.createInstance(appId, activity.applicationContext)
+
+    //信息回调
+    private var mILoginListener: IUiListener? = null
+    private var mIUserListener: IUiListener? = null
+    private var mIShareListener: IUiListener? = null
+
+
 
     override fun shareWeb(shareTag: SHARE_TAG, shareObj: ShareObj) {
         if (shareTag == SHARE_TAG.QQ) {
@@ -64,11 +75,13 @@ class QqHelper(activity: Activity, appId: String?, appKey: String?, appSecret: S
 
     override fun shareImage(shareTag: SHARE_TAG, shareObj: ShareObj) {
         if (TextUtils.isEmpty(shareObj.thumbImagePath)) {
-            error?.invoke("thumbImagePath 分享图片路径不能为空")
+            Log.e(TAG,"thumbImagePath is null")
+            //error?.invoke("thumbImagePath 分享图片路径不能为空")
             return
         }
         if (!File(shareObj.thumbImagePath!!).isFile) {
-            error?.invoke("分享图片必须是本地图片")
+            Log.e(TAG,"分享纯图片必须是本地图片")
+            //error?.invoke("分享图片必须是本地图片")
             return
         }
         if (shareTag == SHARE_TAG.QQ) {
@@ -115,8 +128,8 @@ class QqHelper(activity: Activity, appId: String?, appKey: String?, appSecret: S
     override fun share(
         shareTag: SHARE_TAG,
         shareObj: ShareObj,
-        success: (() -> Unit?)?,
-        error: ((String) -> Unit?)?
+        success: (() -> Unit)?,
+        error: ((String) -> Unit)?
     ) {
         initShareListener()
         super.share(shareTag, shareObj, success, error)
@@ -179,12 +192,10 @@ class QqHelper(activity: Activity, appId: String?, appKey: String?, appSecret: S
     }
 
 
-    private val mTencent: Tencent = Tencent.createInstance(appId, activity.applicationContext)
 
-    private var mILoginListener: IUiListener? = null
-    private var mIUserListener: IUiListener? = null
-    private var mIShareListener: IUiListener? = null
-
+    /**
+     * 监听登陆信息回调
+     */
     private fun initLoginListener() {
         mILoginListener = object : IUiListener {
             override fun onComplete(p0: Any?) {
@@ -207,6 +218,9 @@ class QqHelper(activity: Activity, appId: String?, appKey: String?, appSecret: S
         }
     }
 
+    /**
+     * 监听用户信息回调
+     */
     private fun initUserInfoListener() {
         mIUserListener = object : IUiListener {
             override fun onComplete(p0: Any?) {
@@ -230,12 +244,18 @@ class QqHelper(activity: Activity, appId: String?, appKey: String?, appSecret: S
         }
     }
 
+    /**
+     * 注销
+     */
     override fun logout(activity: Activity) {
         if (!TextUtils.isEmpty(mTencent.accessToken))
             mTencent.logout(getActivity())
     }
-    //
 
+    /**
+     * 获取用户信息
+     * @param loginResult 请求的验证
+     */
     private fun getUserInfo(loginResult: QQLoginResultEntity) {
         mTencent.setAccessToken(loginResult.access_token, loginResult.expires_in)
         mTencent.openId = loginResult.openid
@@ -268,6 +288,7 @@ class QqHelper(activity: Activity, appId: String?, appKey: String?, appSecret: S
     }
 
     override fun destroy() {
+        mTencent.logout(getActivity())
     }
 
 
